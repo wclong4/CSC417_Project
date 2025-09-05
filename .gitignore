@@ -24,7 +24,7 @@ hs_err_pid*
 replay_pid*
 
 # maven stuff
-./target
+target
 
 # parse stuff
 parse

@@ -58,8 +58,14 @@ public class Interpreter {
                     System.out.println("Invalid Identifier");
                     return false;
                 }
-                System.out.println(o);
-                return true;
+                try {
+                    int number = (int) o;
+                    System.out.println(number);
+                    return true;
+                } catch (Exception e) {
+                    System.out.println("\"" + o + "\"");
+                    return true;
+                }
             }
         }
         return false;
