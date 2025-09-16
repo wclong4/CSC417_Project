@@ -14,13 +14,18 @@ public class Run {
      * Gets the environment variables.
      * @return the environment variables
      */
-    public static Map<String, Object> getEnv() {
+    public static Map<String, Object> getEnv() {   
         // set up initial environment
         Map<String, Object> envMap = new HashMap<String, Object>();
         envMap.put("x", (Integer) 10);
         envMap.put("v", (Integer) 5);
         envMap.put("i", (Integer) 1);
         envMap.put("author", "wclong4");
+        envMap.put("add", "+");
+        envMap.put("sub", "-");
+        envMap.put("mul", "*");
+        envMap.put("div", "/");
+        envMap.put("==", "==");
         return envMap;
     }
 
