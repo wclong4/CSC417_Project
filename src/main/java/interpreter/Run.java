@@ -26,6 +26,7 @@ public class Run {
         envMap.put("mul", "*");
         envMap.put("div", "/");
         envMap.put("==", "==");
+        envMap.put("print", "print");
         return envMap;
     }
 
@@ -45,7 +46,10 @@ public class Run {
      */
     public static void interpOut(Map<String, Object> map) {
         Object o = Interpreter.interp(map, getEnv());
-        if (o.getClass().getName().equals("java.lang.Integer")) {
+        if (o == null) {
+            //System.out.println("null");
+            System.exit(0);
+        } else if (o.getClass().getName().equals("java.lang.Integer")) {
             System.out.println((Integer) o );
             System.exit(0);
         } else if (o.getClass().getName().equals("java.lang.Boolean")) {
@@ -70,7 +74,7 @@ public class Run {
         try {
             interpOut(map);
         } catch (Exception e) {
-            System.out.println("Interpretation Error: " + e.getMessage());
+            System.out.println("Interpretation Error -> " + e.getMessage());
             System.exit(1);
         }
     }

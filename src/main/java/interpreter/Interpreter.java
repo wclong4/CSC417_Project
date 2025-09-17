@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This takes in input from the interpreter which comes in JSON format.
- * It is able to take in Identifiers, Strings, and Numbers (32 bit integers)
+ * It is able to take in Identifiers, Strings, and Numbers, Names, Blocks, etc.
  * @author Warren Long (wclong4)
  */
 public class Interpreter {
@@ -35,7 +35,7 @@ public class Interpreter {
     public static Object identifier(Map<String, Object> map, Map<String, Object> envMap, Object value) {
         Object o = envMap.get(value);
         if (o == null) {
-            return false;
+            throw new InterpretationException("Invalid Identifier -> " + value.toString());
         }
         try {
             return number(map, envMap, o);
@@ -57,7 +57,7 @@ public class Interpreter {
             //System.out.println(number);
             return number;
         } catch (Exception e) {
-            throw new InterpretationException("Invalid Number");
+            throw new InterpretationException("Invalid Number -> " + value.toString());
         }
     }
 
@@ -92,9 +92,11 @@ public class Interpreter {
      * 
      * If anything fails, it just throws an error, so if a cast fails, it just returns false
      * 
-     * Also, it has some crazy recursive nonsense where it calls interp, which then calls application
+     * Also, it has some recursive nonsense where it calls interp, which then calls application
      * 
      * This is the worst code written by all mankind for all time.
+     * 
+     * I just really don't like recursion, but it makes this very simple.
      * 
      * @param map the map for the parameters
      * @param envMap the map for the environment variables
@@ -123,9 +125,14 @@ public class Interpreter {
             // literally the worst code I have ever written
             // lord help whoever edits this code next
             // wait, that's me! NOOOOOOOOO
-            for (Object o : (List<Object>) operations.get("Operands")) {
-                operands.add((Object) interp((Map<String, Object>)o,envMap));
+            try {
+                for (Object o : (List<Object>) operations.get("Operands")) {
+                    operands.add((Object) interp((Map<String, Object>)o,envMap));
+                }
+            } catch (Exception e) {
+                throw new InterpretationException("Invalid Operand -> " + e.getLocalizedMessage());
             }
+
             //System.out.println("Operands!!!\n\n\n" + operands.toString());
 
             // parse with applicable fxn and apply operator
@@ -149,10 +156,17 @@ public class Interpreter {
                 boolean output = operands.get(0).equals(operands.get(1));
                 //System.out.println(output);
                 return output;
+            } else if (operator.equals("print")) {
+                // print takes any number of args and prints them all out
+                for (Object o : operands) {
+                    System.out.println(o.toString());
+                }
+                return null;
+            } else {
+                throw new InterpretationException("Invalid Operator");
             }
-            throw new InterpretationException("Invalid Application");
         } catch (Exception e) {
-            throw new InterpretationException("Invalid Application");
+            throw new InterpretationException("Invalid Function Application -> " + e.getLocalizedMessage());
         }
     }
 
@@ -176,7 +190,7 @@ public class Interpreter {
             }
             return null;
         } catch (Exception e) {
-            throw new InterpretationException("Invalid Conditional");
+            throw new InterpretationException("Invalid Conditional -> " + e.getLocalizedMessage());
         }
     }
 
