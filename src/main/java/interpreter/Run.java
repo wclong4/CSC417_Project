@@ -49,10 +49,20 @@ public class Run {
         String s = takeInput();
         // get a map using Jackson
         Map<String, Object> map = Interpreter.parseJson(s);
-        boolean goodExit = Interpreter.interp(map, getEnv());
-        if (goodExit) {
-            System.exit(0);
-        } else {
+        try {
+            Object o = Interpreter.interp(map, getEnv());
+            if (o.getClass().getName().equals("java.lang.Integer")) {
+                System.out.println((Integer) o );
+                System.exit(0);
+            } else if (o.getClass().getName().equals("java.lang.Boolean")) {
+                System.out.println(o);
+                System.exit(0);
+            } else if (o.getClass().getName().equals("java.lang.String")) {
+                System.out.println("\"" + (String) o + "\"");
+                System.exit(0);
+            } 
+        } catch (Exception e) {
+            System.out.println("Interpretation Error: " + e.getMessage());
             System.exit(1);
         }
     }
