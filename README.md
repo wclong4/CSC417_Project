@@ -1,4 +1,4 @@
-This project uses Java and Jackson to build a simple interpreter. Jackson is in jars in the `lib/` directory, so Maven is no longer required.  This change was made because Maven was really slow to build :<
+This project uses Java and Jackson to build a simple interpreter, with JUnit used to test it. Jackson is in jars in the `lib/` directory, so Maven is no longer required.  This change was made because Maven was really slow to build :<
 
 ## Prerequisites
 - A JDK that provides `java` and `javac` on your `PATH` (I used JDK 21)
@@ -17,3 +17,7 @@ Once compiled, you can pipe whatever you want from the parser through the interp
 ```bash
 ./parse -2147483648 | java -cp out:lib/* interpreter.Run
 ```
+
+## Test
+You should be able to run the tests in VSCode using the RedHat java extension.  Make sure you have JUnit4 installed.
+They currently cover all the functionality for CP2.
