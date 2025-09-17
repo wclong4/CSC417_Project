@@ -21,6 +21,27 @@ public class InterpreterTest {
 	Map<String, Object> envMap;
 
 	/**
+	 * 2,147,483,648
+	 */
+	String s1BadInt = "{\"Number\": 2147483648}";
+
+	/**
+	 * -2,147,483,649
+	 */
+	String s2BadInt = "{\"Number\": -2147483649}";
+
+	/**
+	 * 2,147,483,647
+	 */
+	String s1GoodInt = "{\"Number\": 2147483647}";
+
+	/**
+	 * -2,147,483,648
+	 */
+	String s2GoodInt = "{\"Number\": -2147483648}";
+
+
+	/**
 	 * add(1,2)
 	 */
 	String s1Fxn = "{\"Application\": {\"Operator\": {\"Identifier\": \"add\"}, \"Operands\": [{\"Number\": 1}, {\"Number\": 2}]}}";
@@ -261,7 +282,7 @@ public class InterpreterTest {
 			// it should fail here, error message doesn't really matter
 			return;
 		}
-		// it should not hget here
+		// it should not get here
         fail();
 	}
 
@@ -280,5 +301,77 @@ public class InterpreterTest {
 		}
         Object o = Interpreter.interp(map, envMap);
 		assertEquals(246, (int) o);
+	}
+
+	/**
+	 * tests bad int 1
+	 */
+	@Test
+	public void testBadInt1() {
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(s1BadInt);
+			Interpreter.interp(map, envMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// it should fail here, error message doesn't really matter
+			return;
+		}
+		// it should not get here
+        fail();
+	}
+
+	/**
+	 * tests bad int 2
+	 */
+	@Test
+	public void testBadInt2() {
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(s2BadInt);
+			Interpreter.interp(map, envMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// it should fail here, error message doesn't really matter
+			return;
+		}
+		// it should not get here
+        fail();
+	}
+
+	/**
+	 * tests good int 1
+	 */
+	@Test
+	public void testGoodInt1() {
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(s1GoodInt);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, envMap);
+		assertEquals(2147483647, (int) o);
+	}
+
+	/**
+	 * tests good int 2
+	 */
+	@Test
+	public void testGoodInt2() {
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(s2GoodInt);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, envMap);
+		assertEquals(-2147483648, (int) o);
 	}
 }
