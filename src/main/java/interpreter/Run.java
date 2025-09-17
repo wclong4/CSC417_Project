@@ -40,6 +40,24 @@ public class Run {
     }
 
     /**
+     * Handles interpretation using Interpreter.interp
+     * @param map the map to pass in to interpret
+     */
+    public static void interpOut(Map<String, Object> map) {
+        Object o = Interpreter.interp(map, getEnv());
+        if (o.getClass().getName().equals("java.lang.Integer")) {
+            System.out.println((Integer) o );
+            System.exit(0);
+        } else if (o.getClass().getName().equals("java.lang.Boolean")) {
+            System.out.println(o);
+            System.exit(0);
+        } else if (o.getClass().getName().equals("java.lang.String")) {
+            System.out.println("\"" + (String) o + "\"");
+            System.exit(0);
+        } 
+    }
+    
+    /**
      * Our main method, does all our main stuff, woaaaaahhhhh
      * @param args the args (arggggggggggg)
      * @throws Exception if something goes wrong (nothing will go wrong)
@@ -50,17 +68,7 @@ public class Run {
         // get a map using Jackson
         Map<String, Object> map = Interpreter.parseJson(s);
         try {
-            Object o = Interpreter.interp(map, getEnv());
-            if (o.getClass().getName().equals("java.lang.Integer")) {
-                System.out.println((Integer) o );
-                System.exit(0);
-            } else if (o.getClass().getName().equals("java.lang.Boolean")) {
-                System.out.println(o);
-                System.exit(0);
-            } else if (o.getClass().getName().equals("java.lang.String")) {
-                System.out.println("\"" + (String) o + "\"");
-                System.exit(0);
-            } 
+            interpOut(map);
         } catch (Exception e) {
             System.out.println("Interpretation Error: " + e.getMessage());
             System.exit(1);

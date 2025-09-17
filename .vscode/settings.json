@@ -1,6 +1,11 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
+    "java.project.sourcePaths": [
+        "src/main/java",
+        "src/main/test"
+    ],
     "java.project.referencedLibraries": [
-        "lib/*.jar"
+        "lib/*.jar",
+        "test-lib/**/*.jar"
     ]
 }

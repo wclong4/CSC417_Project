@@ -1,7 +1,6 @@
 package interpreter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +99,7 @@ public class Interpreter {
      * @param map the map for the parameters
      * @param envMap the map for the environment variables
      * @param value the value gotten from the key
+     * @throws InterpretationException if anything goes wrong
      * @return a boolean 
      */
     @SuppressWarnings("unchecked")
@@ -128,21 +128,21 @@ public class Interpreter {
             }
             //System.out.println("Operands!!!\n\n\n" + operands.toString());
 
-            // apply operator
+            // parse with applicable fxn and apply operator
             if (operator.equals("+")) {
-                Integer output = (Integer) operands.get(0) + (Integer) operands.get(1);
+                Integer output = (Integer) number(map, envMap, operands.get(0)) + (Integer) number(map, envMap, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("-")) {
-                Integer output = (Integer) operands.get(0) - (Integer) operands.get(1);
+                Integer output = (Integer) number(map, envMap, operands.get(0)) - (Integer) number(map, envMap, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("*")) {
-                Integer output = (Integer) operands.get(0) * (Integer) operands.get(1);
+                Integer output = (Integer) number(map, envMap, operands.get(0)) * (Integer) number(map, envMap, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("/")) {
-                Integer output = (Integer) operands.get(0) / (Integer) operands.get(1);
+                Integer output = (Integer) number(map, envMap, operands.get(0)) / (Integer) number(map, envMap, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("==")) {
@@ -159,6 +159,7 @@ public class Interpreter {
     /**
      * Evaluates a conditional
      * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
     private static Object conditional(Map<String, Object> map, Map<String, Object> envMap, Object value) {
@@ -182,6 +183,7 @@ public class Interpreter {
     /**
      * Evaluates a boolean
      * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
      */
     private static Object bool(Map<String, Object> map, Map<String, Object> envMap, Object value) {
         if (value.equals("true")) {
@@ -201,6 +203,7 @@ public class Interpreter {
      * We are counting on that.  If it isn't there, THIS WILL BREAK!
      * 
      * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
     private static Object let(Map<String, Object> map, Map<String, Object> envMap, Object value) {
@@ -216,6 +219,7 @@ public class Interpreter {
     /**
      * Evaluates a block
      * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
     private static Object block(Map<String, Object> map, Map<String, Object> envMap, Object value) {
@@ -230,13 +234,14 @@ public class Interpreter {
     }
 
     /**
-     * Does basic interpretation of Identifiers, Strings, and Numbers (32 bit ints) 
+     * Does basic interpretation of Identifiers, Strings, and Numbers (32 bit ints), Assignment (Let), Conditionals, Booleans,
+     * Blocks, and Names
      * given a map and an environment.
      * 
      * @param map The map which represents the JSON input from ./parse
      * @param envMap The environment variables map
-     * @return If an identifier does not exist, or a number is outside the range of a 
-     * 32 bit int, otherwise it returns true
+     * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
      */
     public static Object interp(Map<String, Object> map, Map<String, Object> envMap) {
         // go thru the map and find associations
