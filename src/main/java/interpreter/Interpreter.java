@@ -1,6 +1,7 @@
 package interpreter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,15 +33,22 @@ public class Interpreter {
      * @param value the value gotten from the key
      * @return a boolean 
      */
-    public static Object identifier(Map<String, Object> map, Map<String, Object> envMap, Object value) {
-        Object o = envMap.get(value);
-        if (o == null) {
+    public static Object identifier(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
+        Object envVariable = null;
+        // get env variable from env
+        for (Map<String, Object> localEnv : env) {
+            if (localEnv.get(value) != null) {
+                envVariable = localEnv.get(value);
+            }
+        }
+        // make sure it exists
+        if (envVariable == null) {
             throw new InterpretationException("Invalid Identifier -> " + value.toString());
         }
         try {
-            return number(map, envMap, o);
+            return number(map, env, envVariable);
         } catch (Exception e) {
-            return string(map, envMap, o);
+            return string(map, env, envVariable);
         }
     }
 
@@ -51,7 +59,7 @@ public class Interpreter {
      * @param value the value gotten from the key
      * @return a boolean 
      */
-    public static Object number(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    public static Object number(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
             int number = (int) value;
             //System.out.println(number);
@@ -68,7 +76,7 @@ public class Interpreter {
      * @param value the value gotten from the key
      * @return a boolean 
      */
-    public static Object string(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    public static Object string(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         //System.out.println("\"" + value + "\"" );
         return "" + value;
     }
@@ -80,9 +88,9 @@ public class Interpreter {
      * @param value the value gotten from the key
      * @return a name (literally just a string really) 
      */
-    public static Object name(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    public static Object name(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         //System.out.println("\"" + value + "\"" );
-        return "" + value;
+        return string(map, env, value);
     }
 
     /**
@@ -105,7 +113,7 @@ public class Interpreter {
      * @return a boolean 
      */
     @SuppressWarnings("unchecked")
-    public static Object application(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    public static Object application(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
             // when we get the value it should have an operator and operands
             Map<String, Object> operations = (Map<String, Object>) value;
@@ -113,7 +121,7 @@ public class Interpreter {
             // get the operator
             //System.out.println("Operator thingy!!!\n\n\n" + operations.get("Operator").toString());
 
-            String operator = envMap.get(((Map<String, Object>)operations.get("Operator")).get("Identifier")).toString();
+            String operator = identifier(map, env, ((Map<String, Object>)operations.get("Operator")).get("Identifier")).toString();
             //System.out.println("Operator!!!\n\n\n" + operator.toString());
 
             // make operands list
@@ -127,7 +135,7 @@ public class Interpreter {
             // wait, that's me! NOOOOOOOOO
             try {
                 for (Object o : (List<Object>) operations.get("Operands")) {
-                    operands.add((Object) interp((Map<String, Object>)o,envMap));
+                    operands.add((Object) interp((Map<String, Object>)o,env));
                 }
             } catch (Exception e) {
                 throw new InterpretationException("Invalid Operand -> " + e.getLocalizedMessage());
@@ -137,19 +145,19 @@ public class Interpreter {
 
             // parse with applicable fxn and apply operator
             if (operator.equals("+")) {
-                Integer output = (Integer) number(map, envMap, operands.get(0)) + (Integer) number(map, envMap, operands.get(1));
+                Integer output = (Integer) number(map, env, operands.get(0)) + (Integer) number(map, env, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("-")) {
-                Integer output = (Integer) number(map, envMap, operands.get(0)) - (Integer) number(map, envMap, operands.get(1));
+                Integer output = (Integer) number(map, env, operands.get(0)) - (Integer) number(map, env, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("*")) {
-                Integer output = (Integer) number(map, envMap, operands.get(0)) * (Integer) number(map, envMap, operands.get(1));
+                Integer output = (Integer) number(map, env, operands.get(0)) * (Integer) number(map, env, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("/")) {
-                Integer output = (Integer) number(map, envMap, operands.get(0)) / (Integer) number(map, envMap, operands.get(1));
+                Integer output = (Integer) number(map, env, operands.get(0)) / (Integer) number(map, env, operands.get(1));
                 //System.out.println(output);
                 return output;
             } else if (operator.equals("==")) {
@@ -176,16 +184,16 @@ public class Interpreter {
      * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
-    private static Object conditional(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    private static Object conditional(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
             // cast our conditional
             List<Object> conditional = (List<Object>) value;
             for (Object o : conditional) {
                 // this is awful
-                Boolean b = (Boolean) interp((Map<String, Object>)(((Map<String, Object>)o).get("Test")), envMap);
+                Boolean b = (Boolean) interp((Map<String, Object>)(((Map<String, Object>)o).get("Test")), env);
                 if (b) {
                     // look at these casts, why java, why?
-                    return interp((Map<String, Object>)(((Map<String, Object>)o).get("Consequent")), envMap);
+                    return interp((Map<String, Object>)(((Map<String, Object>)o).get("Consequent")), env);
                 }
             }
             return null;
@@ -199,7 +207,7 @@ public class Interpreter {
      * @return an object of some sort
      * @throws InterpretationException if anything goes wrong
      */
-    private static Object bool(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    private static Object bool(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         if (value.equals("true")) {
             return true;
         } else if (value.equals("false")) {
@@ -220,14 +228,16 @@ public class Interpreter {
      * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
-    private static Object let(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    private static Object let(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         // cast to map
         Map<String, Object> m = (Map<String, Object>)((Map<String, Object>) value);
+        Map<String, Object> localEnv = new HashMap<>();
+        localEnv.put("" + interp((Map<String, Object>) m.get("Parameter"), env), 
+            interp((Map<String, Object>) m.get("Expression"), env));
         // add to env
-        envMap.put("" + interp((Map<String, Object>) m.get("Parameter"), envMap), 
-            interp((Map<String, Object>) m.get("Expression"), envMap));
+        env.add(localEnv);
 
-        return block(map, envMap, m.get("Block"));
+        return block(map, env, m.get("Block"));
     }
 
     /**
@@ -236,13 +246,13 @@ public class Interpreter {
      * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
-    private static Object block(Map<String, Object> map, Map<String, Object> envMap, Object value) {
+    private static Object block(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         // get parameter, cast to map
         List<Object> block = (List<Object>) value;
         // add to env
         Object finalResult = null;
         for (Object o : block) {
-           finalResult = interp((Map<String, Object>) o, envMap);
+           finalResult = interp((Map<String, Object>) o, env);
         }
         return finalResult;
     }
@@ -250,14 +260,14 @@ public class Interpreter {
     /**
      * Does basic interpretation of Identifiers, Strings, and Numbers (32 bit ints), Assignment (Let), Conditionals, Booleans,
      * Blocks, and Names
-     * given a map and an environment.
+     * Given a map and an environment.
      * 
      * @param map The map which represents the JSON input from ./parse
-     * @param envMap The environment variables map
+     * @param envMap The environment variables map list
      * @return an object of some sort
      * @throws InterpretationException if anything goes wrong
      */
-    public static Object interp(Map<String, Object> map, Map<String, Object> envMap) {
+    public static Object interp(Map<String, Object> map, List<Map<String, Object>> env) {
         // go thru the map and find associations
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             //System.out.println(entry.getKey() + ": " + entry.getValue());
@@ -267,23 +277,23 @@ public class Interpreter {
             
             try {
                 if (key.equals("String")) {
-                    return string(map, envMap, value);
+                    return string(map, env, value);
                 } else if (key.equals("Number")) {
-                    return number(map, envMap, value);
+                    return number(map, env, value);
                 } else if (key.equals("Identifier")) {
-                    return identifier(map, envMap, value);
+                    return identifier(map, env, value);
                 } else if (key.equals("Application")) {
-                    return application(map, envMap, value);
+                    return application(map, env, value);
                 } else if (key.equals("Cond")) {
-                    return conditional(map, envMap, value);
+                    return conditional(map, env, value);
                 } else if (key.equals("Boolean")) {
-                    return bool(map, envMap, value);
+                    return bool(map, env, value);
                 } else if (key.equals("Let")) {
-                    return let(map, envMap, value);
+                    return let(map, env, value);
                 } else if (key.equals("Block")) {
-                    return block(map, envMap, value);
+                    return block(map, env, value);
                 } else if (key.equals("Name")) {
-                    return name(map, envMap, value);
+                    return name(map, env, value);
                 } else {
                     throw new InterpretationException("Invalid Type");
                 }

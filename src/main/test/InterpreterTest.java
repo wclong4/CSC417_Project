@@ -2,6 +2,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -18,7 +20,7 @@ public class InterpreterTest {
 	/**
 	 * our env map
 	 */
-	Map<String, Object> envMap;
+	List<Map<String, Object>> env;
 
 	/**
 	 * 2,147,483,648
@@ -100,9 +102,9 @@ public class InterpreterTest {
 	 * our setup, sets up initial env
 	 */
 	@Before
-	public void setup() {
-		envMap = new HashMap<String, Object>();
+    public void setup() {   
         // set up initial environment
+        Map<String, Object> envMap = new HashMap<String, Object>();
         envMap.put("x", (Integer) 10);
         envMap.put("v", (Integer) 5);
         envMap.put("i", (Integer) 1);
@@ -112,7 +114,10 @@ public class InterpreterTest {
         envMap.put("mul", "*");
         envMap.put("div", "/");
         envMap.put("==", "==");
-	}
+        envMap.put("print", "print");
+        env = new LinkedList<>();
+        env.add(envMap);
+    }
 
     /**
 	 * tests basic fxn 1
@@ -127,7 +132,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(3, (int) o);
 	}
 
@@ -144,7 +149,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(11, (int) o);
 	}
 
@@ -161,7 +166,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(153, (int) o);
 	}
 
@@ -178,7 +183,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(99, (int) o);
 	}
 
@@ -195,7 +200,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(true, (boolean) o);
 	}
 
@@ -212,7 +217,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(false, (boolean) o);
 	}
 
@@ -229,7 +234,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals("Equal", (String) o);
 	}
 
@@ -246,7 +251,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(300, (int) o);
 	}
 
@@ -263,7 +268,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(246, (int) o);
 	}
 
@@ -276,7 +281,7 @@ public class InterpreterTest {
 		Map<String, Object> map = null;
 		try {
 			map = Interpreter.parseJson(s2Block);
-			Interpreter.interp(map, envMap);
+			Interpreter.interp(map, env);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// it should fail here, error message doesn't really matter
@@ -299,7 +304,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(246, (int) o);
 	}
 
@@ -312,7 +317,7 @@ public class InterpreterTest {
 		Map<String, Object> map = null;
 		try {
 			map = Interpreter.parseJson(s1BadInt);
-			Interpreter.interp(map, envMap);
+			Interpreter.interp(map, env);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// it should fail here, error message doesn't really matter
@@ -331,7 +336,7 @@ public class InterpreterTest {
 		Map<String, Object> map = null;
 		try {
 			map = Interpreter.parseJson(s2BadInt);
-			Interpreter.interp(map, envMap);
+			Interpreter.interp(map, env);
 		} catch (Exception e) {
 			e.printStackTrace();
 			// it should fail here, error message doesn't really matter
@@ -354,7 +359,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(2147483647, (int) o);
 	}
 
@@ -371,7 +376,7 @@ public class InterpreterTest {
 			e.printStackTrace();
 			fail();
 		}
-        Object o = Interpreter.interp(map, envMap);
+        Object o = Interpreter.interp(map, env);
 		assertEquals(-2147483648, (int) o);
 	}
 }

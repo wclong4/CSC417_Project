@@ -1,6 +1,8 @@
 package interpreter;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -14,7 +16,7 @@ public class Run {
      * Gets the environment variables.
      * @return the environment variables
      */
-    public static Map<String, Object> getEnv() {   
+    public static List<Map<String, Object>> getEnv() {   
         // set up initial environment
         Map<String, Object> envMap = new HashMap<String, Object>();
         envMap.put("x", (Integer) 10);
@@ -27,7 +29,9 @@ public class Run {
         envMap.put("div", "/");
         envMap.put("==", "==");
         envMap.put("print", "print");
-        return envMap;
+        List<Map<String, Object>> envList = new LinkedList<>();
+        envList.add(envMap);
+        return envList;
     }
 
     /**
@@ -47,7 +51,7 @@ public class Run {
     public static void interpOut(Map<String, Object> map) {
         Object o = Interpreter.interp(map, getEnv());
         if (o == null) {
-            //System.out.println("null");
+            System.out.println("null");
             System.exit(0);
         } else if (o.getClass().getName().equals("java.lang.Integer")) {
             System.out.println((Integer) o );
