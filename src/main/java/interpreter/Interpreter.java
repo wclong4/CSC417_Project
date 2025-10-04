@@ -320,7 +320,7 @@ public class Interpreter {
 
     /**
      * Does basic interpretation of Identifiers, Strings, and Numbers (32 bit ints), Assignment (Let), Conditionals, Booleans,
-     * Blocks, and Names
+     * Blocks, Names, and Functions (Lambdas)
      * Given a map and an environment.
      * 
      * @param map The map which represents the JSON input from ./parse

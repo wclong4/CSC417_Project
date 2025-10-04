@@ -404,12 +404,13 @@ public class InterpreterTest {
         Object o = Interpreter.interp(map, env);
 		assertEquals(-2147483648, (int) o);
 	}
+	
 	/**
 	 * tests dynamic factorial
 	 * @throws IOException 
 	 */
 	@Test
-	public void testDynamicFactorial1() throws IOException {
+	public void testDynamicFxn1() throws IOException {
 		String output = parseFileHelper("fact-let.417");
 		// parse the Json from whatever string we want for this test
 		Map<String, Object> map = null;
@@ -424,11 +425,11 @@ public class InterpreterTest {
 	}
 
 	/**
-	 * tests dynamic factorial
+	 * tests dynamic scope
 	 * @throws IOException 
 	 */
 	@Test
-	public void testDynamicFactorial2() throws IOException {
+	public void testDynamicFxn2() throws IOException {
 		String output = parseFileHelper("lexical-scope.417");
 		// parse the Json from whatever string we want for this test
 		Map<String, Object> map = null;
@@ -443,12 +444,12 @@ public class InterpreterTest {
 	}
 
 	/**
-	 * tests dynamic factorial
+	 * tests dynamic fib
 	 * @throws IOException 
 	 */
 	@Test
-	public void testDynamicFactorial3() throws IOException {
-		String output = parseFileHelper("fib.417");
+	public void testDynamicFxn3() throws IOException {
+		String output = parseFileHelper("fib_13.417");
 		// parse the Json from whatever string we want for this test
 		Map<String, Object> map = null;
 		try {
@@ -458,7 +459,25 @@ public class InterpreterTest {
 			fail();
 		}
         Object o = Interpreter.interp(map, env);
-		assertEquals(3, (int) o);
+		assertEquals(233, (int) o);
 	}
 
+	/**
+	 * tests dynamic fib
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDynamicFxn4() throws IOException {
+		String output = parseFileHelper("fib_20.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		assertEquals(6765, (int) o);
+	}
 }
