@@ -1,6 +1,9 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -118,7 +121,29 @@ public class InterpreterTest {
         env = new LinkedList<>();
         env.add(envMap);
     }
+	/**
+	 * Helps parse a file
+	 * @param file the file to parse
+	 * @return the parsed file string
+	 */
+	public String parseFileHelper(String file) {
+		try {
+			ProcessBuilder pb = new ProcessBuilder("./parse", "-f", file);
+			Process process = pb.start();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			String output = "";
+			while ((line = reader.readLine()) != null) {
+				output += line;
+			}
+			return output;
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		return "failed";
 
+	}
     /**
 	 * tests basic fxn 1
 	 */
@@ -379,4 +404,61 @@ public class InterpreterTest {
         Object o = Interpreter.interp(map, env);
 		assertEquals(-2147483648, (int) o);
 	}
+	/**
+	 * tests dynamic factorial
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDynamicFactorial1() throws IOException {
+		String output = parseFileHelper("fact-let.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		assertEquals(720, (int) o);
+	}
+
+	/**
+	 * tests dynamic factorial
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDynamicFactorial2() throws IOException {
+		String output = parseFileHelper("lexical-scope.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		assertEquals(6, (int) o);
+	}
+
+	/**
+	 * tests dynamic factorial
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDynamicFactorial3() throws IOException {
+		String output = parseFileHelper("fib.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		assertEquals(3, (int) o);
+	}
+
 }

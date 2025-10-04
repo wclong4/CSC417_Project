@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -48,7 +49,12 @@ public class Interpreter {
         try {
             return number(map, env, envVariable);
         } catch (Exception e) {
-            return string(map, env, envVariable);
+            if (envVariable.getClass().getName().equals("java.lang.String")) {
+                return string(map, env, envVariable);
+            } else {
+                // just return it as an object
+                return envVariable;
+            }
         }
     }
 
@@ -121,7 +127,7 @@ public class Interpreter {
             // get the operator
             //System.out.println("Operator thingy!!!\n\n\n" + operations.get("Operator").toString());
 
-            String operator = identifier(map, env, ((Map<String, Object>)operations.get("Operator")).get("Identifier")).toString();
+            Object operator = identifier(map, env, ((Map<String, Object>)operations.get("Operator")).get("Identifier"));
             //System.out.println("Operator!!!\n\n\n" + operator.toString());
 
             // make operands list
@@ -140,6 +146,8 @@ public class Interpreter {
             } catch (Exception e) {
                 throw new InterpretationException("Invalid Operand -> " + e.getLocalizedMessage());
             }
+            //System.out.println("Operator type!!!\n\n\n" + operator.getClass().getName());
+            //System.out.println("Operator!!!\n\n\n" + operator.toString());
 
             //System.out.println("Operands!!!\n\n\n" + operands.toString());
 
@@ -164,13 +172,46 @@ public class Interpreter {
                 boolean output = operands.get(0).equals(operands.get(1));
                 //System.out.println(output);
                 return output;
+            } else if (operator.equals(">")) {
+                boolean output = (Integer) number(map, env, operands.get(0)) > (Integer) number(map, env, operands.get(1));
+                //System.out.println(output);
+                return output;
+            } else if (operator.equals("<")) {
+                boolean output = (Integer) number(map, env, operands.get(0)) < (Integer) number(map, env, operands.get(1));
+                //System.out.println(output);
+                return output;
             } else if (operator.equals("print")) {
                 // print takes any number of args and prints them all out
                 for (Object o : operands) {
                     System.out.println(o.toString());
                 }
                 return null;
+            }  else if (operator != null) {
+                // get our parameters
+                List<Map<String, Object>> parameters = (List<Map<String, Object>>) ((Map<String, Object>) operator).get("Parameters");
+                // make a local env
+                Map<String, Object> localEnv = new HashMap<>();
+                int i = 0;
+                // go over parameters and add our operands as parameters
+                for (Map<String, Object> parameter : parameters) {
+                    localEnv.put((String)(parameter).get("Name"), operands.get(i));
+                    i++;
+                }
+                // add to env and pop after eval
+                env.add(localEnv);
+                try {
+                    // eval function body
+                    return block(map, env, ((Map<String, Object>) operator).get("Block"));
+                } finally {
+                    // pop the local env
+                    // it is so over
+                    // local env is going to meet its maker :( 
+                    env.remove(env.size() - 1);
+                }
             } else {
+                // we are not at a base case
+                // this is dead code, but java won't compile without it
+                // so it stays here
                 throw new InterpretationException("Invalid Operator");
             }
         } catch (Exception e) {
@@ -232,12 +273,17 @@ public class Interpreter {
         // cast to map
         Map<String, Object> m = (Map<String, Object>)((Map<String, Object>) value);
         Map<String, Object> localEnv = new HashMap<>();
-        localEnv.put("" + interp((Map<String, Object>) m.get("Parameter"), env), 
+        localEnv.put("" + interp((Map<String, Object>) m.get("Parameter"), env),
             interp((Map<String, Object>) m.get("Expression"), env));
-        // add to env
+        // add local env, and then get rid of it
         env.add(localEnv);
-
-        return block(map, env, m.get("Block"));
+        try {
+            return block(map, env, m.get("Block"));
+        } finally {
+            // it's over :( 
+            // locaEnv must die
+            env.remove(env.size() - 1);
+        }
     }
 
     /**
@@ -255,6 +301,21 @@ public class Interpreter {
            finalResult = interp((Map<String, Object>) o, env);
         }
         return finalResult;
+    }
+
+    /**
+     * Evaluates a lambda
+     * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
+     */
+    private static Object lambda(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
+        // get value, cast to map
+        //Map<String, Object> subMap = (Map<String, Object>) value;
+        //Map<String, Object> parameters = (Map<String, Object>) subMap.get("Parameters");
+        //Map<String, Object> block = (Map<String, Object>) subMap.get("Block");
+
+        // just return the value, 0 processing
+        return value;      
     }
 
     /**
@@ -294,6 +355,8 @@ public class Interpreter {
                     return block(map, env, value);
                 } else if (key.equals("Name")) {
                     return name(map, env, value);
+                } else if (key.equals("Lambda")) {
+                    return lambda(map, env, value);
                 } else {
                     throw new InterpretationException("Invalid Type");
                 }

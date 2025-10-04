@@ -28,6 +28,8 @@ public class Run {
         envMap.put("mul", "*");
         envMap.put("div", "/");
         envMap.put("==", "==");
+        envMap.put(">", ">");
+        envMap.put("<", "<");
         envMap.put("print", "print");
         List<Map<String, Object>> envList = new LinkedList<>();
         envList.add(envMap);
