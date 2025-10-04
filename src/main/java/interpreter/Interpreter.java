@@ -50,7 +50,7 @@ public class Interpreter {
         }
         // make sure it exists
         if (envVariable == null) {
-            throw new InterpretationException("Invalid Identifier -> " + key.toString());
+            throw new InterpretationException("Undefined Identifier -> " + key.toString());
         }   
         return envVariable;
     }
