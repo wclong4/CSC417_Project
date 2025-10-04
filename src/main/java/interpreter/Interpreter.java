@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -343,16 +342,22 @@ public class Interpreter {
      * @return an object of some sort
      * @throws InterpretationException if anything goes wrong
      */
+    @SuppressWarnings("unchecked")
     private static Object lambda(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
-        // return a fxn value and attach current env
-        if (value instanceof Map) {
-            Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) value);
-            fxnVal.put("ClosureEnv", new ArrayList<>(env));
-            return fxnVal;
+        try {
+            // return a fxn value and attach current env
+            if (value instanceof Map) {
+                Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) value);
+                fxnVal.put("ClosureEnv", new ArrayList<>(env));
+                return fxnVal;
+            }
+            // return value if for some reason value isn't a map??????
+            // maybe this should just throw an exception?
+            return value;  
+        } catch (Exception e) {
+            throw new InterpretationException("Invalid Lambda");
         }
-        // return value if for some reason value isn't a map??????
-        // maybe this should just throw an exception?
-        return value;      
+
     }
 
     /**
