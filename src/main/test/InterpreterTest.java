@@ -404,7 +404,7 @@ public class InterpreterTest {
         Object o = Interpreter.interp(map, env);
 		assertEquals(-2147483648, (int) o);
 	}
-	
+
 	/**
 	 * tests dynamic factorial
 	 * @throws IOException 
@@ -440,7 +440,7 @@ public class InterpreterTest {
 			fail();
 		}
         Object o = Interpreter.interp(map, env);
-		assertEquals(6, (int) o);
+		assertEquals(10005, (int) o);
 	}
 
 	/**
@@ -479,5 +479,24 @@ public class InterpreterTest {
 		}
         Object o = Interpreter.interp(map, env);
 		assertEquals(6765, (int) o);
+	}
+
+	/**
+	 * tests dynamic fib
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDynamicFxn5() throws IOException {
+		String output = parseFileHelper("fact-cp3.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		assertEquals(479001600, (int) o);
 	}
 }

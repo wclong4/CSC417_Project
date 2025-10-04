@@ -10,7 +10,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This takes in input from the interpreter which comes in JSON format.
- * It is able to take in Identifiers, Strings, and Numbers, Names, Blocks, etc.
+ * It is able to take in Identifiers, Strings, and Numbers, Names, Blocks, Functions, etc.
+ * It has lexical scope, which is implemented with closure.
+ * That means we store the environment of the function when the function was made with the function.
+ * 
+ * Also, application is really bloated now, so maybe I should refactor.
+ * I'll just leave that for future me.
+ * 
  * @author Warren Long (wclong4)
  */
 public class Interpreter {
@@ -28,6 +34,27 @@ public class Interpreter {
     }
 
     /**
+     * Gets an object from env
+     * @param env the env to look in
+     * @param key the key to look for
+     * @return the value associated with the key
+     */
+    public static Object getFromEnv(List<Map<String, Object>> env, Object key) {
+        Object envVariable = null;
+        // get env variable from env
+        for (int i = env.size(); i > 0; i-- ) {
+            Map<String, Object> localEnv = env.get(i - 1);
+            if (localEnv.get(key) != null) {
+                envVariable = localEnv.get(key);
+            }
+        }
+        // make sure it exists
+        if (envVariable == null) {
+            throw new InterpretationException("Invalid Identifier -> " + key.toString());
+        }   
+        return envVariable;
+    }
+    /**
      * Parses an identifier
      * @param map the map for the parameters
      * @param envMap the map for the environment variables
@@ -35,17 +62,7 @@ public class Interpreter {
      * @return a boolean 
      */
     public static Object identifier(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
-        Object envVariable = null;
-        // get env variable from env
-        for (Map<String, Object> localEnv : env) {
-            if (localEnv.get(value) != null) {
-                envVariable = localEnv.get(value);
-            }
-        }
-        // make sure it exists
-        if (envVariable == null) {
-            throw new InterpretationException("Invalid Identifier -> " + value.toString());
-        }
+        Object envVariable = getFromEnv(env, value);
         try {
             return number(map, env, envVariable);
         } catch (Exception e) {
@@ -125,8 +142,6 @@ public class Interpreter {
             Map<String, Object> operations = (Map<String, Object>) value;
             //System.out.println("OPERATIONS!!!\n\n\n" + operations.toString());
             // get the operator
-            //System.out.println("Operator thingy!!!\n\n\n" + operations.get("Operator").toString());
-
             Object operator = identifier(map, env, ((Map<String, Object>)operations.get("Operator")).get("Identifier"));
             //System.out.println("Operator!!!\n\n\n" + operator.toString());
 
@@ -189,25 +204,32 @@ public class Interpreter {
             }  else if (operator != null) {
                 // get our parameters
                 List<Map<String, Object>> parameters = (List<Map<String, Object>>) ((Map<String, Object>) operator).get("Parameters");
-                // make a local env
+                // make a local env for arguments
                 Map<String, Object> localEnv = new HashMap<>();
+                // oh my god, closure https://en.wikipedia.org/wiki/Closure_(computer_programming)
+                // use closure from fxn
+                List<Map<String, Object>> closureEnv = (List<Map<String, Object>>) ((Map<String, Object>) operator).get("ClosureEnv");
+                // fall back to dynamic scope if no closureEnv
+                List<Map<String, Object>> baseEnv = null;
+                if (closureEnv != null) {
+                    baseEnv = closureEnv;
+                } else {
+                    baseEnv = env;
+                }
+                // make new call environment as a fresh list as to not change closureEnv
+                List<Map<String, Object>> callEnv = new ArrayList<>(baseEnv);
+
                 int i = 0;
                 // go over parameters and add our operands as parameters
                 for (Map<String, Object> parameter : parameters) {
                     localEnv.put((String)(parameter).get("Name"), operands.get(i));
                     i++;
                 }
-                // add to env and pop after eval
-                env.add(localEnv);
-                try {
-                    // eval function body
-                    return block(map, env, ((Map<String, Object>) operator).get("Block"));
-                } finally {
-                    // pop the local env
-                    // it is so over
-                    // local env is going to meet its maker :( 
-                    env.remove(env.size() - 1);
-                }
+
+                // extend environment for call with new parameters and eval block
+                callEnv.add(localEnv);
+                return block(map, callEnv, ((Map<String, Object>) operator).get("Block"));
+               
             } else {
                 // we are not at a base case
                 // this is dead code, but java won't compile without it
@@ -273,9 +295,20 @@ public class Interpreter {
         // cast to map
         Map<String, Object> m = (Map<String, Object>)((Map<String, Object>) value);
         Map<String, Object> localEnv = new HashMap<>();
-        localEnv.put("" + interp((Map<String, Object>) m.get("Parameter"), env),
-            interp((Map<String, Object>) m.get("Expression"), env));
-        // add local env, and then get rid of it
+        // get our parameter
+        Object paramName = interp((Map<String, Object>) m.get("Parameter"), env);
+        // get the expression value
+        Object exprVal = interp((Map<String, Object>) m.get("Expression"), env);
+        // if dealing with a lambda, use lexical env
+        if (exprVal instanceof Map && ((Map<?, ?>) exprVal).get("Parameters") != null && ((Map<?, ?>) exprVal).get("Block") != null) {
+            Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) exprVal);
+            // put a shallow copy of the current env list in for lexical scope
+            fxnVal.put("ClosureEnv", new ArrayList<>(env));
+            exprVal = fxnVal;
+        }
+        localEnv.put("" + paramName, exprVal);
+
+        // push local env for the block and ensure it is popped
         env.add(localEnv);
         try {
             return block(map, env, m.get("Block"));
@@ -305,16 +338,20 @@ public class Interpreter {
 
     /**
      * Evaluates a lambda
+     * Does closure stuff, woahhhh
+     * https://en.wikipedia.org/wiki/Closure_(computer_programming)
      * @return an object of some sort
      * @throws InterpretationException if anything goes wrong
      */
     private static Object lambda(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
-        // get value, cast to map
-        //Map<String, Object> subMap = (Map<String, Object>) value;
-        //Map<String, Object> parameters = (Map<String, Object>) subMap.get("Parameters");
-        //Map<String, Object> block = (Map<String, Object>) subMap.get("Block");
-
-        // just return the value, 0 processing
+        // return a fxn value and attach current env
+        if (value instanceof Map) {
+            Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) value);
+            fxnVal.put("ClosureEnv", new ArrayList<>(env));
+            return fxnVal;
+        }
+        // return value if for some reason value isn't a map??????
+        // maybe this should just throw an exception?
         return value;      
     }
 
