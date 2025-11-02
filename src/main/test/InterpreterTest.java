@@ -499,4 +499,66 @@ public class InterpreterTest {
         Object o = Interpreter.interp(map, env);
 		assertEquals(479001600, (int) o);
 	}
+
+	/**
+	 * tests assignment
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAssignment1() throws IOException {
+		String output = parseFileHelper("testAssignment1.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(2, (int) o);
+	}
+
+	/**
+	 * tests assignment
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAssignment2() throws IOException {
+		String output = parseFileHelper("testAssignment2.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(4, (int) o);
+	}
+
+	/**
+	 * tests assignment
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAssignment3() throws IOException {
+		String output = parseFileHelper("testAssignment3.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			Interpreter.interp(map, env);
+			// should not get here
+			fail();
+		} catch (Exception e) {
+			String actual = e.getMessage();
+			assertEquals("Invalid Assignment", actual);
+
+		}
+	}
+
 }

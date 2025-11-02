@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Warren Long (wclong4)
  */
 public class Interpreter {
+
     /**
      * Parses JSON as a map
      * @param json json to parse
@@ -63,8 +64,17 @@ public class Interpreter {
     public static Object identifier(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         Object envVariable = getFromEnv(env, value);
         try {
+            // try to cast as number
             return number(map, env, envVariable);
-        } catch (Exception e) {
+        } catch (Exception e1) {
+            try {
+                // try to cast as bool
+                return bool(map, env, envVariable);
+            } catch (Exception e2) {
+                // do nothing
+            }
+            
+            // is it a string?
             if (envVariable.getClass().getName().equals("java.lang.String")) {
                 return string(map, env, envVariable);
             } else {
@@ -361,6 +371,66 @@ public class Interpreter {
     }
 
     /**
+     * Evaluates a def
+     * 
+     * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
+     */
+    @SuppressWarnings("unchecked")
+    private static Object def(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
+        try {
+            // return a fxn value and attach current env
+            if (value instanceof Map) {
+                Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) value);
+                fxnVal.put("ClosureEnv", new ArrayList<>(env));
+                return fxnVal;
+            }
+            // return value if for some reason value isn't a map??????
+            // maybe this should just throw an exception?
+            return value;  
+        } catch (Exception e) {
+            throw new InterpretationException("Invalid Lambda");
+        }
+
+    }
+
+    /**
+     * Evaluates an assignment
+     *
+     * @return an object of some sort
+     * @throws InterpretationException if anything goes wrong
+     */
+    @SuppressWarnings("unchecked")
+    private static Object assignment(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
+        try {
+            Object envVariable = null;
+            Object key = ((Map<String, Object>)value).get("Identifier");
+            
+            // run this thru interp to get it down to some base case for storage
+            Object newValue = interp((Map<String, Object>)((Map<String, Object>)value).get("Expression"), env);
+            // get env variable from env
+            for (int i = env.size(); i > 0; i-- ) {
+                Map<String, Object> localEnv = env.get(i - 1);
+                if (localEnv.get(key) != null) {
+                    // update the value with the new one
+                    localEnv.put("" + key, newValue);
+                    envVariable = localEnv.get(key);
+                }
+            }
+
+            // make sure it exists
+            if (envVariable == null) {
+                throw new InterpretationException("Undefined Identifier -> " + key.toString());
+            }   
+
+            return null;
+        } catch (Exception e) {
+            throw new InterpretationException("Invalid Assignment");
+        }
+
+    }
+
+    /**
      * Does basic interpretation of Identifiers, Strings, and Numbers (32 bit ints), Assignment (Let), Conditionals, Booleans,
      * Blocks, Names, and Functions (Lambdas)
      * Given a map and an environment.
@@ -397,6 +467,10 @@ public class Interpreter {
                     return block(map, env, value);
                 } else if (key.equals("Name")) {
                     return name(map, env, value);
+                } else if (key.equals("Def")) {
+                    return def(map, env, value);
+                } else if (key.equals("Assignment")) {
+                    return assignment(map, env, value);
                 } else if (key.equals("Lambda")) {
                     return lambda(map, env, value);
                 } else {

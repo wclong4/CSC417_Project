@@ -13,6 +13,7 @@ cp -f "parse" "$SCRIPT_DIR/parse"
 cd ..
 
 # Make our Java program
+echo "[build.sh] Building Java Program"
 mkdir -p out
 javac -cp "lib/*" -d out $(find src/main/java -name "*.java")
 

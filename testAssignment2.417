@@ -1,0 +1,10 @@
+{
+    let z = 1;
+    let stuff = fn() {
+        z = add(z, 1)
+    };
+    stuff();
+    stuff();
+    stuff();
+    z
+}
