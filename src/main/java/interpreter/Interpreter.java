@@ -63,24 +63,16 @@ public class Interpreter {
      */
     public static Object identifier(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         Object envVariable = getFromEnv(env, value);
-        try {
-            // try to cast as number
+        // is it a number?
+        if (envVariable.getClass().getName().equals("java.lang.Integer")) {
             return number(map, env, envVariable);
-        } catch (Exception e1) {
-            try {
-                // try to cast as bool
-                return bool(map, env, envVariable);
-            } catch (Exception e2) {
-                // do nothing
-            }
-            
-            // is it a string?
-            if (envVariable.getClass().getName().equals("java.lang.String")) {
-                return string(map, env, envVariable);
-            } else {
-                // just return it as an object
-                return envVariable;
-            }
+        } else if (envVariable.getClass().getName().equals("java.lang.Boolean")) {
+            return bool(map, env, envVariable);
+        } else if (envVariable.getClass().getName().equals("java.lang.String")) {
+            return string(map, env, envVariable);
+        } else {
+            // just return it as an object
+            return envVariable;
         }
     }
 
@@ -261,11 +253,23 @@ public class Interpreter {
             // cast our conditional
             List<Object> conditional = (List<Object>) value;
             for (Object o : conditional) {
-                // this is awful
-                Boolean b = (Boolean) interp((Map<String, Object>)(((Map<String, Object>)o).get("Test")), env);
-                if (b) {
+                // Pull out the test expression
+                // This can be a map
+                // It can also be a list with 1 item, which I genuinely disgust
+                Object testNode = ((Map<String, Object>) o).get("Test");
+
+                Object testResult;
+                if (testNode instanceof Map) {
+                    testResult = interp((Map<String, Object>) testNode, env);
+                } else if (testNode instanceof List) {
+                    testResult = block(map, env, testNode);
+                } else {
+                    throw new InterpretationException("Invalid Conditional Test");
+                }
+
+                if ((boolean) testResult) {
                     // look at these casts, why java, why?
-                    return interp((Map<String, Object>)(((Map<String, Object>)o).get("Consequent")), env);
+                    return interp((Map<String, Object>) (((Map<String, Object>) o).get("Consequent")), env);
                 }
             }
             return null;
@@ -373,23 +377,31 @@ public class Interpreter {
     /**
      * Evaluates a def
      * 
+     * Currently this will just put x into whatever local environment 
+     * it is supposed to go.  It will not look up and see if anything
+     * is called x in a higher env.
+     * 
+     * will result in 1 x in the environment
      * @return an object of some sort
      * @throws InterpretationException if anything goes wrong
      */
     @SuppressWarnings("unchecked")
     private static Object def(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
-            // return a fxn value and attach current env
-            if (value instanceof Map) {
-                Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) value);
-                fxnVal.put("ClosureEnv", new ArrayList<>(env));
-                return fxnVal;
-            }
-            // return value if for some reason value isn't a map??????
-            // maybe this should just throw an exception?
-            return value;  
+            Object envVariable = null;
+            Object key = ((Map<String, Object>)((Map<String, Object>)value).get("Parameter")).get("Name");
+            
+            // run this thru interp to get it down to some base case for storage
+            Object newValue = interp((Map<String, Object>)((Map<String, Object>)value).get("Expression"), env);
+
+            // put x in
+            if (envVariable == null) {
+                env.get(env.size() - 1).put("" + key, newValue);
+            }   
+
+            return null;
         } catch (Exception e) {
-            throw new InterpretationException("Invalid Lambda");
+            throw new InterpretationException("Invalid Definition");
         }
 
     }

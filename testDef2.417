@@ -1,0 +1,10 @@
+{
+    def z = 1;
+    def stuff = fn() {
+        z = add(z, 1)
+    };
+    stuff();
+    stuff();
+    stuff();
+    z
+}

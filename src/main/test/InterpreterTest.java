@@ -416,12 +416,11 @@ public class InterpreterTest {
 		Map<String, Object> map = null;
 		try {
 			map = Interpreter.parseJson(output);
+			Interpreter.interp(map, env);
+			fail();
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
 		}
-        Object o = Interpreter.interp(map, env);
-		assertEquals(720, (int) o);
 	}
 
 	/**
@@ -454,12 +453,11 @@ public class InterpreterTest {
 		Map<String, Object> map = null;
 		try {
 			map = Interpreter.parseJson(output);
+			Interpreter.interp(map, env);
+			fail();
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
 		}
-        Object o = Interpreter.interp(map, env);
-		assertEquals(233, (int) o);
 	}
 
 	/**
@@ -473,12 +471,11 @@ public class InterpreterTest {
 		Map<String, Object> map = null;
 		try {
 			map = Interpreter.parseJson(output);
+			Interpreter.interp(map, env);
+			fail();
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
 		}
-        Object o = Interpreter.interp(map, env);
-		assertEquals(6765, (int) o);
 	}
 
 	/**
@@ -559,6 +556,126 @@ public class InterpreterTest {
 			assertEquals("Invalid Assignment", actual);
 
 		}
+	}
+
+	/**
+	 * tests def
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDef1() throws IOException {
+		String output = parseFileHelper("testDef1.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(1, (int) o);
+	}
+
+	/**
+	 * tests def
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDef2() throws IOException {
+		String output = parseFileHelper("testDef2.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(4, (int) o);
+	}
+
+	/**
+	 * tests def
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDef3() throws IOException {
+		String output = parseFileHelper("testDef3.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(233, (int) o);
+	}
+
+	/**
+	 * tests def
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDef4() throws IOException {
+		String output = parseFileHelper("testDef4.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(720, (int) o);
+	}
+
+	/**
+	 * tests def
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDef5() throws IOException {
+		String output = parseFileHelper("testDef5.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(false, (boolean) o);
+	}
+
+	/**
+	 * tests def
+	 * @throws IOException 
+	 */
+	@Test
+	public void testDef6() throws IOException {
+		String output = parseFileHelper("testDef6.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(true, (boolean) o);
 	}
 
 }

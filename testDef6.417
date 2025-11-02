@@ -1,0 +1,15 @@
+{
+    def is_even = fn(n) {
+        if (==(n,0)) then true
+        else is_odd(sub(n,1))
+    };
+
+    def is_odd = fn(n) {
+        if (==(n,0)) then false
+        else is_even(sub(n,1))
+    };
+
+    is_odd(15)
+}
+
+
