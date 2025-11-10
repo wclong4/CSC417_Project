@@ -64,11 +64,11 @@ public class Interpreter {
     public static Object identifier(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         Object envVariable = getFromEnv(env, value);
         // is it a number?
-        if (envVariable.getClass().getName().equals("java.lang.Integer")) {
+        if (envVariable instanceof Integer) {
             return number(map, env, envVariable);
-        } else if (envVariable.getClass().getName().equals("java.lang.Boolean")) {
+        } else if (envVariable instanceof Boolean) {
             return bool(map, env, envVariable);
-        } else if (envVariable.getClass().getName().equals("java.lang.String")) {
+        } else if (envVariable instanceof String) {
             return string(map, env, envVariable);
         } else {
             // just return it as an object

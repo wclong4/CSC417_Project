@@ -55,13 +55,13 @@ public class Run {
         if (o == null) {
             System.out.println("null");
             System.exit(0);
-        } else if (o.getClass().getName().equals("java.lang.Integer")) {
+        } else if (o instanceof Integer) {
             System.out.println((Integer) o );
             System.exit(0);
-        } else if (o.getClass().getName().equals("java.lang.Boolean")) {
+        } else if (o instanceof Boolean) {
             System.out.println(o);
             System.exit(0);
-        } else if (o.getClass().getName().equals("java.lang.String")) {
+        } else if (o instanceof String) {
             System.out.println("\"" + (String) o + "\"");
             System.exit(0);
         } 
