@@ -2,14 +2,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -101,6 +103,26 @@ public class InterpreterTest {
 	 */
 	String s3Block = "{\"Block\": [{\"Let\": {\"Parameter\": {\"Name\": \"a\", \"Type\": \":untyped\"}, \"Expression\": {\"Number\": 123}, \"Block\": [{\"Let\": {\"Parameter\": {\"Name\": \"b\", \"Type\": \":untyped\"}, \"Expression\": {\"Number\": 2}, \"Block\": [{\"Application\": {\"Operator\": {\"Identifier\": \"mul\"}, \"Operands\": [{\"Identifier\": \"a\"}, {\"Identifier\": \"b\"}]}}]}}]}}]}";
 
+	/**
+	 * Citation, used stack overflow
+	 * https://stackoverflow.com/questions/1119385/junit-test-for-system-out-println
+	 */
+	private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+	private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+	private final PrintStream originalOut = System.out;
+	private final PrintStream originalErr = System.err;
+
+	@Before
+	public void setUpStreams() {
+		System.setOut(new PrintStream(outContent));
+		System.setErr(new PrintStream(errContent));
+	}
+
+	@After
+	public void restoreStreams() {
+		System.setOut(originalOut);
+		System.setErr(originalErr);
+	}
 	/**
 	 * our setup, sets up initial env
 	 */
@@ -678,4 +700,136 @@ public class InterpreterTest {
 		assertEquals(true, (boolean) o);
 	}
 
+	/**
+	 * tests testAssignFail
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAssignFail() throws IOException {
+		String output = parseFileHelper("assign-fail.417");
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			Interpreter.interp(map, env);
+			// should not get here
+			fail();
+		} catch (Exception e) {
+		}
+	}
+
+	/**
+	 * tests assign outer
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAssignOuter() throws IOException {
+		String output = parseFileHelper("assign-outer.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(2, (int) o);
+	}
+
+	/**
+	 * tests assign outer 2
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAssignOuter2() throws IOException {
+		String output = parseFileHelper("assign-outer2.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(1, (int) o);
+	}
+
+	/**
+	 * tests counter
+	 * @throws IOException 
+	 */
+	@Test
+	public void testCounter() throws IOException {
+		String output = parseFileHelper("counter.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Interpreter.interp(map, env);
+    	assertEquals("1\n2\n3\n4\n5\n", outContent.toString());
+	}
+
+	/**
+	 * tests even-odd
+	 * @throws IOException 
+	 */
+	@Test
+	public void testEvenOdd() throws IOException {
+		String output = parseFileHelper("even-odd.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Interpreter.interp(map, env);
+    	assertEquals("Is 10 odd?\nfalse\nIs 20 even?\ntrue\n" + //
+						"", outContent.toString());
+	}
+
+	/**
+	 * tests fact-let
+	 * @throws IOException 
+	 */
+	@Test
+	public void testFactLet() throws IOException {
+		String output = parseFileHelper("fact=let.417");
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			Interpreter.interp(map, env);
+			// should not get here
+			fail();
+		} catch (Exception e) {
+		}
+	}
+
+	/**
+	 * tests fact
+	 * @throws IOException 
+	 */
+	@Test
+	public void testFact() throws IOException {
+		String output = parseFileHelper("fact.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(720, (int) o);
+	}
 }

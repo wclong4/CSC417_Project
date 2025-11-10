@@ -46,6 +46,7 @@ public class Interpreter {
             Map<String, Object> localEnv = env.get(i - 1);
             if (localEnv.get(key) != null) {
                 envVariable = localEnv.get(key);
+                break;
             }
         }
         // make sure it exists
@@ -150,11 +151,9 @@ public class Interpreter {
             List<Object> operands = new ArrayList<Object>();
 
             // go through operands and put them in list
-            // oh my god, this function has so many arbitrary casts
+            // his function has so many arbitrary casts
             // and it has recursion
             // literally the worst code I have ever written
-            // lord help whoever edits this code next
-            // wait, that's me! NOOOOOOOOO
             try {
                 for (Object o : (List<Object>) operations.get("Operands")) {
                     operands.add((Object) interp((Map<String, Object>)o,env));
@@ -312,12 +311,16 @@ public class Interpreter {
         Object paramName = interp((Map<String, Object>) m.get("Parameter"), env);
         // get the expression value
         Object exprVal = interp((Map<String, Object>) m.get("Expression"), env);
-        // if dealing with a lambda, use lexical env
+        // if dealing with a lambda, attach lexical env only if not already captured
         if (exprVal instanceof Map && ((Map<?, ?>) exprVal).get("Parameters") != null && ((Map<?, ?>) exprVal).get("Block") != null) {
-            Map<String, Object> fxnVal = new HashMap<>((Map<String, Object>) exprVal);
-            // put a shallow copy of the current env list in for lexical scope
-            fxnVal.put("ClosureEnv", new ArrayList<>(env));
-            exprVal = fxnVal;
+            Map<String, Object> fxnVal = (Map<String, Object>) exprVal;
+            // don't overwrite existing closure
+            if (fxnVal.get("ClosureEnv") == null) {
+                Map<String, Object> fxnValCopy = new HashMap<>(fxnVal);
+                // put a shallow copy of the current env list in for lexical scope
+                fxnValCopy.put("ClosureEnv", new ArrayList<>(env));
+                exprVal = fxnValCopy;
+            }
         }
         localEnv.put("" + paramName, exprVal);
 
@@ -367,7 +370,7 @@ public class Interpreter {
             }
             // return value if for some reason value isn't a map??????
             // maybe this should just throw an exception?
-            return value;  
+            throw new InterpretationException("Invalid Lambda.  Bad Map.");
         } catch (Exception e) {
             throw new InterpretationException("Invalid Lambda");
         }
