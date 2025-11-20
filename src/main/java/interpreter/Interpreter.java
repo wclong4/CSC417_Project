@@ -387,9 +387,11 @@ public class Interpreter {
      */
     @SuppressWarnings("unchecked")
     private static Object block(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
-        // get parameter, cast to map
+        // this code is dead simple
+        // get value, cast it to be a list of objects
         List<Object> block = (List<Object>) value;
-        // add to env
+
+        // just go through and call interp on every single object in the block
         Object finalResult = null;
         for (Object o : block) {
            finalResult = interp((Map<String, Object>) o, env);
@@ -437,12 +439,20 @@ public class Interpreter {
     private static Object def(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
             Object envVariable = null;
+
+            // get the key for the definition
+            // if we had def x=1
+            // this would be x
             Object key = ((Map<String, Object>)((Map<String, Object>)value).get("Parameter")).get("Name");
             
             // run this thru interp to get it down to some base case for storage
+            // if we had def x=1
+            // this would be 1
             Object newValue = interp((Map<String, Object>)((Map<String, Object>)value).get("Expression"), env);
 
-            // put x in
+            // put key=newValue into whatever the local environment is
+            // we are assigning, say, def x=1 into the local environment
+            // which is just the environment at the end of the env list
             if (envVariable == null) {
                 env.get(env.size() - 1).put("" + key, newValue);
             }   
@@ -464,11 +474,21 @@ public class Interpreter {
     private static Object assignment(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
             Object envVariable = null;
+            // get the key
+            // if we had 
+            // def x=1; // definition
+            // x=2 // assignment
+            // this would be x
             Object key = ((Map<String, Object>)value).get("Identifier");
             
             // run this thru interp to get it down to some base case for storage
+            // if we had x=1, or x=add(0,1)
+            // this would be 1
             Object newValue = interp((Map<String, Object>)((Map<String, Object>)value).get("Expression"), env);
-            // get env variable from env
+
+            // put key=newValue into the first environment we find it in
+            // we go through every env in the env list
+            // and if we don't find the key, then we throw an exception
             for (int i = env.size(); i > 0; i-- ) {
                 Map<String, Object> localEnv = env.get(i - 1);
                 if (localEnv.get(key) != null) {
@@ -479,6 +499,7 @@ public class Interpreter {
             }
 
             // make sure it exists
+            // if it doesn't, throw an exception
             if (envVariable == null) {
                 throw new InterpretationException("Undefined Identifier -> " + key.toString());
             }   
