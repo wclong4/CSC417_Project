@@ -29,16 +29,23 @@
 
     // prime check using % up to sqrt(n)
     def notPrime1 = 5829283;
+    def notPrime2 = -3;
+    def notPrime3 = 1;
+
     def prime1 = 197484821;
+    def prime2 = 2;
+    def prime3 = 3;
 
     // choose the value to test
-    def checkValue = notPrime1;
+    def checkValue = prime3;
 
     // assume prime until divisor is found
     def isPrime = true;
 
     // checks for prime
     def primeCheckerFor() = fn() {
+        // this is inefficient because it doesn't just return here
+        if <(checkValue, 2) then {isPrime = false};
         let b = 2;
         let end = add(sqrt(checkValue), 1);
         // iterate b from 2 to floor(sqrt(n)) inclusive
@@ -64,6 +71,8 @@
 
     // checks for prime
     def primeCheckerWhile() = fn() {
+        // this is inefficient because it doesn't just return here
+        if <(checkValue, 2) then {isPrime = false};
         let b = 2;
         let end = add(sqrt(checkValue), 1);
         // iterate b from 2 to floor(sqrt(n)) inclusive
