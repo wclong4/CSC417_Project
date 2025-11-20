@@ -22,13 +22,17 @@
     // I am using while and for loops as they are much much faster than recursion
     // the recursive way of calculating prime numbers is severely inefficient
     // and will break the java stack very quickly
-    
+
+    // more generally, recursion just irks me
+    // it really grinds my gears
+    // so I don't want to use it unless I have to
+
     // prime check using % up to sqrt(n)
     def notPrime1 = 5829283;
     def prime1 = 197484821;
 
     // choose the value to test
-    def checkValue = prime1;
+    def checkValue = notPrime1;
 
     // assume prime until divisor is found
     def isPrime = true;

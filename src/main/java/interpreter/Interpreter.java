@@ -156,32 +156,32 @@ public class Interpreter {
                 Object result = null;
 
                 // use our old operands over and over
-                List<Object> rawOperands = (List<Object>) operations.get("Operands");
+                List<Object> operands = (List<Object>) operations.get("Operands");
 
                 // get the start and end and run the given function over and over using interp
                 // theoretically you could use a function or really anything that
                 // evaluates to an int for start or end
-                int start = (int) number(map, env, interp((Map<String, Object>) rawOperands.get(0), env));
-                int end = (int) number(map, env, interp((Map<String, Object>) rawOperands.get(1), env));
+                int start = (int) number(map, env, interp((Map<String, Object>) operands.get(0), env));
+                int end = (int) number(map, env, interp((Map<String, Object>) operands.get(1), env));
                 for (int i = start; i < end; i++) {
-                    result = interp((Map<String, Object>) rawOperands.get(2), env);
+                    result = interp((Map<String, Object>) operands.get(2), env);
                 }
                 return result;
             }
 
             // special case early return for while
             if ("while".equals(operator)) {
-                List<Object> rawOperands = (List<Object>) operations.get("Operands");
+                List<Object> operands = (List<Object>) operations.get("Operands");
                 Object result = null;
-                if (rawOperands.size() == 1) {
+                if (operands.size() == 1) {
                     // condition controls loop
-                    while ((Boolean) interp((Map<String, Object>) rawOperands.get(0), env)) {
+                    while ((Boolean) interp((Map<String, Object>) operands.get(0), env)) {
                         result = null;
                     }
-                } else if (rawOperands.size() >= 2) {
+                } else if (operands.size() >= 2) {
                     // run body each time condition is true
-                    while ((Boolean) interp((Map<String, Object>) rawOperands.get(0), env)) {
-                        result = interp((Map<String, Object>) rawOperands.get(1), env);
+                    while ((Boolean) interp((Map<String, Object>) operands.get(0), env)) {
+                        result = interp((Map<String, Object>) operands.get(1), env);
                     }
                 }
                 return result;
