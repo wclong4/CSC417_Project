@@ -31,6 +31,11 @@ public class Run {
         envMap.put(">", ">");
         envMap.put("<", "<");
         envMap.put("print", "print");
+        envMap.put("pow", "pow");
+        envMap.put("for", "for");
+        envMap.put("while", "while");
+        envMap.put("sqrt", "sqrt");
+        envMap.put("%", "%");
         List<Map<String, Object>> envList = new LinkedList<>();
         envList.add(envMap);
         return envList;

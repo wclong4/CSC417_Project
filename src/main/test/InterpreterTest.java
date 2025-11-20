@@ -832,4 +832,24 @@ public class InterpreterTest {
 		System.out.println(o);
 		assertEquals(720, (int) o);
 	}
+
+	/**
+	 * tests for
+	 * @throws IOException 
+	 */
+	@Test
+	public void testFor() throws IOException {
+		String output = parseFileHelper("forLoops.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(null, o);
+	}
 }

@@ -1,0 +1,51 @@
+{
+    // prime check using % up to sqrt(n)
+    def notPrime1 = 23523451;
+    def prime1 = 197;
+
+    // choose the value to test
+    def checkValue = notPrime1;
+
+    // assume prime until divisor is found
+    def isPrime = true;
+
+    // checks for prime
+    def primeCheckerFor() = fn() {
+        let b = 2;
+        let end = add(sqrt(checkValue), 1);
+        // iterate b from 2 to floor(sqrt(n)) inclusive
+        for(2, end, {
+            if ==(%(checkValue, b), 0) then { isPrime = false } else false;
+            b = add(b, 1)
+        });
+
+        // return boolean; runner prints true/false
+        isPrime
+    };
+
+    print("primeCheckerFor()");
+    print(primeCheckerFor());
+
+    // mimic for loop using while
+    def iterator() = fn(a, b) {
+        def val = <(a, b);
+        a = add(a,1);
+        val
+    };
+
+    // checks for prime
+    def primeCheckerWhile() = fn() {
+        let b = 2;
+        let end = add(sqrt(checkValue), 1);
+        // iterate b from 2 to floor(sqrt(n)) inclusive
+        while(iterator(b, end), {
+            if ==(%(checkValue, b), 0) then { isPrime = false } else false;
+            b = add(b, 1)
+        });
+
+        // return boolean; runner prints true/false
+        isPrime
+    };
+    print("primeCheckerWhile()");
+    primeCheckerWhile()
+}

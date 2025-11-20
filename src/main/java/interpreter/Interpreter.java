@@ -19,6 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Warren Long (wclong4)
  */
 public class Interpreter {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
 
     /**
      * Parses JSON as a map
@@ -68,7 +71,8 @@ public class Interpreter {
         if (envVariable instanceof Integer) {
             return number(map, env, envVariable);
         } else if (envVariable instanceof Boolean) {
-            return bool(map, env, envVariable);
+            // Already a boolean value; return it directly
+            return (Boolean) envVariable;
         } else if (envVariable instanceof String) {
             return string(map, env, envVariable);
         } else {
@@ -147,13 +151,45 @@ public class Interpreter {
             Object operator = identifier(map, env, ((Map<String, Object>)operations.get("Operator")).get("Identifier"));
             //System.out.println("Operator!!!\n\n\n" + operator.toString());
 
+            // special case early return for for
+            if ("for".equals(operator)) {
+                Object result = null;
+
+                // use our old operands over and over
+                List<Object> rawOperands = (List<Object>) operations.get("Operands");
+
+                // get the start and end and run the given function over and over using interp
+                // theoretically you could use a function or really anything that
+                // evaluates to an int for start or end
+                int start = (int) number(map, env, interp((Map<String, Object>) rawOperands.get(0), env));
+                int end = (int) number(map, env, interp((Map<String, Object>) rawOperands.get(1), env));
+                for (int i = start; i < end; i++) {
+                    result = interp((Map<String, Object>) rawOperands.get(2), env);
+                }
+                return result;
+            }
+
+            // special case early return for while
+            if ("while".equals(operator)) {
+                List<Object> rawOperands = (List<Object>) operations.get("Operands");
+                Object result = null;
+                if (rawOperands.size() == 1) {
+                    // condition controls loop
+                    while ((Boolean) interp((Map<String, Object>) rawOperands.get(0), env)) {
+                        result = null;
+                    }
+                } else if (rawOperands.size() >= 2) {
+                    // run body each time condition is true
+                    while ((Boolean) interp((Map<String, Object>) rawOperands.get(0), env)) {
+                        result = interp((Map<String, Object>) rawOperands.get(1), env);
+                    }
+                }
+                return result;
+            }
+
             // make operands list
             List<Object> operands = new ArrayList<Object>();
 
-            // go through operands and put them in list
-            // his function has so many arbitrary casts
-            // and it has recursion
-            // literally the worst code I have ever written
             try {
                 for (Object o : (List<Object>) operations.get("Operands")) {
                     operands.add((Object) interp((Map<String, Object>)o,env));
@@ -201,6 +237,15 @@ public class Interpreter {
                     System.out.println(o.toString());
                 }
                 return null;
+            } else if (operator.equals("%")) {
+                int output = (Integer) number(map, env, operands.get(0)) % (Integer) number(map, env, operands.get(1));
+                return output;
+            }  else if (operator.equals("pow")) {
+                int output = (int) Math.round(Math.pow((double) number(map, env, operands.get(0)), (double) number(map, env, operands.get(1))));
+                return output;
+            }   else if (operator.equals("sqrt")) {
+                int output = (int) Math.round(Math.sqrt((Integer)number(map, env, operands.get(0))));
+                return output;
             }  else if (operator != null) {
                 // get our parameters
                 List<Map<String, Object>> parameters = (List<Map<String, Object>>) ((Map<String, Object>) operator).get("Parameters");
