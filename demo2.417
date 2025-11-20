@@ -12,7 +12,7 @@
 
     // well, if we had a number n, the biggest factor it could possibly have
     // would be if n was a perfect square, so n=m*m where
-    // m=sqrt(n)
+    // m=sqrt(n) and m is a prime
     // so the biggest possible factor is the sqrt(n)
     
     // but I don't know all the prime numbers below n, and I don't want to calculate them
@@ -37,7 +37,7 @@
     def prime3 = 3;
 
     // choose the value to test
-    def checkValue = prime3;
+    def checkValue = prime1;
 
     // assume prime until divisor is found
     def isPrime = true;
@@ -55,12 +55,15 @@
             b = add(b, 1)
         });
 
-        // return boolean; runner prints true/false
+        // return true if prime, false if not
         isPrime
     };
 
     print("primeCheckerFor()");
     print(primeCheckerFor());
+
+    // reset isPrime
+    def isPrime = true;
 
     // mimic for loop using while
     def iterator() = fn(a, b) {
@@ -82,7 +85,7 @@
             b = add(b, 1)
         });
 
-        // return boolean; runner prints true/false
+        // return true if prime, false if not
         isPrime
     };
     print("primeCheckerWhile()");
