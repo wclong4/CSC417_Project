@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import interpreter.Interpreter;
+import interpreter.TypeChecker;
 
 /**
  * Tests the interpreter class
@@ -139,7 +140,14 @@ public class InterpreterTest {
         envMap.put("mul", "*");
         envMap.put("div", "/");
         envMap.put("==", "==");
+        envMap.put(">", ">");
+        envMap.put("<", "<");
         envMap.put("print", "print");
+        envMap.put("pow", "pow");
+        envMap.put("for", "for");
+        envMap.put("while", "while");
+        envMap.put("sqrt", "sqrt");
+        envMap.put("%", "%");
         env = new LinkedList<>();
         env.add(envMap);
     }
@@ -850,6 +858,421 @@ public class InterpreterTest {
 		}
         Object o = Interpreter.interp(map, env);
 		System.out.println(o);
-		assertEquals(null, o);
+		assertEquals(true, o);
+	}
+
+	/**
+	 * tests while
+	 * @throws IOException 
+	 */
+	@Test
+	public void testWhile() throws IOException {
+		String output = parseFileHelper("whileLoops.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+        Object o = Interpreter.interp(map, env);
+		System.out.println(o);
+		assertEquals(true, o);
+	}
+
+	/**
+	 * tests fact without type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testTypeFact() throws IOException {
+		String output = parseFileHelper("fact.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		fail();
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType1() throws IOException {
+		String output = parseFileHelper("type1.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals(":int", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType2() throws IOException {
+		String output = parseFileHelper("type2.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals(":unit", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType3() throws IOException {
+		String output = parseFileHelper("type3.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals(":bool", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType4() throws IOException {
+		String output = parseFileHelper("type4.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals(":str", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType5() throws IOException {
+		String output = parseFileHelper("type5.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		fail();
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType6() throws IOException {
+		String output = parseFileHelper("type6.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		fail();
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType7() throws IOException {
+		String output = parseFileHelper("type7.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals(":str", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType8() throws IOException {
+		String output = parseFileHelper("type8.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals("(:bool -> :bool)", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType9() throws IOException {
+		String output = parseFileHelper("type9.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals("(:int, :int -> :int)", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType10() throws IOException {
+		String output = parseFileHelper("type10.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o);
+		assertEquals("(:str -> :str)", o.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType11() throws IOException {
+		String output = parseFileHelper("type11.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o1 = null;
+		Object o2 = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o1 = TypeChecker.typeOf(map);
+			o2 = Interpreter.interp(map, env);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o1);
+		System.out.println(o2);
+		assertEquals(":str", o1.toString());
+		assertEquals("thing", o2.toString());
+
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType12() throws IOException {
+		String output = parseFileHelper("type12.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		try {
+			map = Interpreter.parseJson(output);
+			TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		fail();
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType13() throws IOException {
+		String output = parseFileHelper("type13.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o1 = null;
+		Object o2 = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o1 = TypeChecker.typeOf(map);
+			o2 = Interpreter.interp(map, env);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o1);
+		System.out.println(o2);
+		assertEquals(":str", o1.toString());
+		assertEquals("new person", o2.toString());
+
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType14() throws IOException {
+		String output = parseFileHelper("type14.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o1 = null;
+		Object o2 = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o1 = TypeChecker.typeOf(map);
+			o2 = Interpreter.interp(map, env);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o1);
+		System.out.println(o2);
+		assertEquals(":int", o1.toString());
+		assertEquals("12", o2.toString());
+
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType15() throws IOException {
+		String output = parseFileHelper("type15.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o1 = null;
+		Object o2 = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o1 = TypeChecker.typeOf(map);
+			o2 = Interpreter.interp(map, env);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o1);
+		System.out.println(o2);
+		assertEquals(":int", o1.toString());
+		assertEquals("12", o2.toString());
+
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType16() throws IOException {
+		String output = parseFileHelper("type16.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o1 = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o1 = TypeChecker.typeOf(map);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o1);
+		assertEquals("((:int -> :int), (:int -> :int) -> (:int -> :int))", o1.toString());
+	}
+
+	/**
+	 * tests type
+	 * @throws IOException 
+	 */
+	@Test
+	public void testType17() throws IOException {
+		String output = parseFileHelper("type17.417");
+		// parse the Json from whatever string we want for this test
+		Map<String, Object> map = null;
+		Object o1 = null;
+		Object o2 = null;
+		try {
+			map = Interpreter.parseJson(output);
+			o1 = TypeChecker.typeOf(map);
+			o2 = Interpreter.interp(map, env);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+		System.out.println(o1);
+		System.out.println(o2);
+		assertEquals(":int", o1.toString());
+		assertEquals("25", o2.toString());
+
 	}
 }

@@ -1,0 +1,5 @@
+{ // should result in an arrow type :str -> :str
+    def thing :str = "thing";
+    def identity (:str -> :str) = fn (k :str) :str { k };
+    identity(thing)
+}

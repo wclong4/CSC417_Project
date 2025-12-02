@@ -1,0 +1,8 @@
+{ // compose(f, g), results in f(g(n))
+    def compose ((:int -> :int) (:int -> :int) -> (:int -> :int)) =
+        fn (f (:int -> :int), g (:int -> :int)) (:int -> :int) {
+            fn (n :int) :int { f(g(n)) }
+        };
+
+    compose
+}

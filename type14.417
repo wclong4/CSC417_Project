@@ -1,0 +1,4 @@
+{ // should result in an arrow type :str
+    add = mul;
+    add(3,4)
+}

@@ -4,17 +4,15 @@
 // Return value is 'null' because 'print' returns no useful value.
 
 {
-    let count = {
-        let n = 0;
-        fn() {
+    def count = fn(n) {
             n = add(n, 1);
             n
-        }
     };
 
-    print(count());
-    print(count());
-    print(count());
-    print(count());
-    print(count())
+    def n = 0;
+    print(count(n));
+    print(count(n));
+    print(count(n));
+    print(count(n));
+    print(count(n))
 }

@@ -1,0 +1,4 @@
+{ // should be :bool
+    def thing :bool = true;
+    thing
+}

@@ -1,0 +1,12 @@
+{ // compose(f, g), results in f(g(n))
+    def compose ((:int -> :int) (:int -> :int) -> (:int -> :int)) =
+        fn (f (:int -> :int), g (:int -> :int)) (:int -> :int) {
+            fn (n :int) :int { f(g(n)) }
+        };
+
+    def thing1 (:int -> :int) = fn (k :int) :int { mul(2, k) };
+    def thing2 (:int -> :int) = fn (k :int) :int { add(3, k) };
+
+    let thing12 (:int -> :int) = compose(thing1, thing2);
+    thing12(3)
+}

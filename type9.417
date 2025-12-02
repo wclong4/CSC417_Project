@@ -1,0 +1,3 @@
+{ // should result in an arrow type
+    add
+}

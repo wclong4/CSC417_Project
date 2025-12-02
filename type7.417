@@ -1,0 +1,4 @@
+{ // should result in str
+    let thing :str = "stuff";
+    thing
+}

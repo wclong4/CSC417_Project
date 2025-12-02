@@ -1,0 +1,4 @@
+{ // should be :str
+    def thing :str = "stuff";
+    thing
+}

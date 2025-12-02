@@ -1,51 +1,63 @@
 {
+    // I found a very large prime first try just by smashing keys
+    // 18674736551
+    // it is actually too large to fit in an int 32
+    // prime numbers get less common as numbers get bigger, so
+    // getting a prime this large on a first try has a chance of 
+    // roughly 1/ln(18674736551) = ~4%
+
+    // to check for a prime number, all we need to do is
+    // to check if all the prime numbers below the sqrt(n) divide it cleanly
+    // why is this the case?
+
+    // well, if we had a number n, the biggest factor it could possibly have
+    // would be if n was a perfect square, so n=m*m where
+    // m=sqrt(n) and m is a prime
+    // so the biggest possible factor is the sqrt(n)
+    
+    // but I don't know all the prime numbers below n, and I don't want to calculate them
+    // and it isn't efficient to calculate them
+    // so I am just using all the integers below n
+
+    // I am using while and for loops as they are much much faster than recursion
+    // the recursive way of calculating prime numbers is severely inefficient
+    // and will break the java stack very quickly
+
+    // more generally, recursion just irks me
+    // it really grinds my gears
+    // so I don't want to use it unless I have to
+
     // prime check using % up to sqrt(n)
-    def notPrime1 = 23523451;
-    def prime1 = 197;
+    def notPrime1 = 5829283;
+    def notPrime2 = -3;
+    def notPrime3 = 1;
+
+    def prime1 = 197484821;
+    def prime2 = 2;
+    def prime3 = 3;
 
     // choose the value to test
-    def checkValue = notPrime1;
+    def checkValue = prime1;
 
     // assume prime until divisor is found
     def isPrime = true;
 
     // checks for prime
     def primeCheckerFor() = fn() {
+        // this is inefficient because it doesn't just return here
+        if <(checkValue, 2) then {isPrime = false};
         let b = 2;
         let end = add(sqrt(checkValue), 1);
         // iterate b from 2 to floor(sqrt(n)) inclusive
+        // this is inefficient because there is no break statement
         for(2, end, {
             if ==(%(checkValue, b), 0) then { isPrime = false } else false;
             b = add(b, 1)
         });
 
-        // return boolean; runner prints true/false
+        // return true if prime, false if not
         isPrime
     };
 
-    print("primeCheckerFor()");
-    print(primeCheckerFor());
-
-    // mimic for loop using while
-    def iterator() = fn(a, b) {
-        def val = <(a, b);
-        a = add(a,1);
-        val
-    };
-
-    // checks for prime
-    def primeCheckerWhile() = fn() {
-        let b = 2;
-        let end = add(sqrt(checkValue), 1);
-        // iterate b from 2 to floor(sqrt(n)) inclusive
-        while(iterator(b, end), {
-            if ==(%(checkValue, b), 0) then { isPrime = false } else false;
-            b = add(b, 1)
-        });
-
-        // return boolean; runner prints true/false
-        isPrime
-    };
-    print("primeCheckerWhile()");
-    primeCheckerWhile()
+    primeCheckerFor()
 }

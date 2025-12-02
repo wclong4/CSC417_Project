@@ -8,7 +8,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * This takes in input from the interpreter which comes in JSON format.
+ * This takes in input from the parser which comes in JSON format.
  * It is able to take in Identifiers, Strings, and Numbers, Names, Blocks, Functions, etc.
  * It has lexical scope, which is implemented with closure.
  * That means we store the environment of the function when the function was made with the function.
@@ -19,10 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Warren Long (wclong4)
  */
 public class Interpreter {
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-
     /**
      * Parses JSON as a map
      * @param json json to parse
@@ -71,7 +67,7 @@ public class Interpreter {
         if (envVariable instanceof Integer) {
             return number(map, env, envVariable);
         } else if (envVariable instanceof Boolean) {
-            // Already a boolean value; return it directly
+            // already a boolean value, return it directly
             return (Boolean) envVariable;
         } else if (envVariable instanceof String) {
             return string(map, env, envVariable);
@@ -91,7 +87,6 @@ public class Interpreter {
     public static Object number(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
         try {
             int number = (int) value;
-            //System.out.println(number);
             return number;
         } catch (Exception e) {
             throw new InterpretationException("Invalid Number -> " + value.toString());
@@ -106,7 +101,6 @@ public class Interpreter {
      * @return a boolean 
      */
     public static Object string(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
-        //System.out.println("\"" + value + "\"" );
         return "" + value;
     }
 
@@ -118,7 +112,6 @@ public class Interpreter {
      * @return a name (literally just a string really) 
      */
     public static Object name(Map<String, Object> map, List<Map<String, Object>> env, Object value) {
-        //System.out.println("\"" + value + "\"" );
         return string(map, env, value);
     }
 
@@ -146,11 +139,8 @@ public class Interpreter {
         try {
             // when we get the value it should have an operator and operands
             Map<String, Object> operations = (Map<String, Object>) value;
-            //System.out.println("OPERATIONS!!!\n\n\n" + operations.toString());
             // get the operator
             Object operator = identifier(map, env, ((Map<String, Object>)operations.get("Operator")).get("Identifier"));
-            //System.out.println("Operator!!!\n\n\n" + operator.toString());
-
             // special case early return for for
             if ("for".equals(operator)) {
                 Object result = null;
@@ -197,39 +187,28 @@ public class Interpreter {
             } catch (Exception e) {
                 throw new InterpretationException("Invalid Operand -> " + e.getLocalizedMessage());
             }
-            //System.out.println("Operator type!!!\n\n\n" + operator.getClass().getName());
-            //System.out.println("Operator!!!\n\n\n" + operator.toString());
-
-            //System.out.println("Operands!!!\n\n\n" + operands.toString());
 
             // parse with applicable fxn and apply operator
             if (operator.equals("+")) {
                 Integer output = (Integer) number(map, env, operands.get(0)) + (Integer) number(map, env, operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals("-")) {
                 Integer output = (Integer) number(map, env, operands.get(0)) - (Integer) number(map, env, operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals("*")) {
                 Integer output = (Integer) number(map, env, operands.get(0)) * (Integer) number(map, env, operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals("/")) {
                 Integer output = (Integer) number(map, env, operands.get(0)) / (Integer) number(map, env, operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals("==")) {
                 boolean output = operands.get(0).equals(operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals(">")) {
                 boolean output = (Integer) number(map, env, operands.get(0)) > (Integer) number(map, env, operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals("<")) {
                 boolean output = (Integer) number(map, env, operands.get(0)) < (Integer) number(map, env, operands.get(1));
-                //System.out.println(output);
                 return output;
             } else if (operator.equals("print")) {
                 // print takes any number of args and prints them all out

@@ -1,0 +1,4 @@
+{ // should result in an arrow type :str
+    author = "new person";
+    author
+}

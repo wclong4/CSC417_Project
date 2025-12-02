@@ -4,7 +4,7 @@ package interpreter;
  * Class used for exceptions when interpreting.
  * This gets called whenever something goes wrong with Interpreter.java
  * 
- * @author Warren
+ * @author Warren Long (wclong4)
  */
 public class InterpretationException extends RuntimeException {
     public InterpretationException() {

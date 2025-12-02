@@ -1,0 +1,4 @@
+{ // should be :int
+    def thing :int = 5;
+    thing
+}
