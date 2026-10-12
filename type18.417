@@ -1,0 +1,22 @@
+{
+    def f = fn () { 
+       3
+    };
+
+    def g  = fn () { 
+       mul(x,x)
+    };
+
+    def h = { 
+       print("Hello"); 
+       1
+    };
+
+    def w = { 
+       print("World"); 
+       1
+    };
+
+    f(h);
+    g(w)
+}

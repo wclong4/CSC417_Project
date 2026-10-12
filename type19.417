@@ -1,0 +1,12 @@
+{
+    let count (->:int) = {
+        let n :int = 0;
+        fn() :int {
+            n = add(n, 1);
+            n
+        }
+    };
+
+    print(count(), count(), count());
+    print(count())
+}

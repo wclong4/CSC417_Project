@@ -84,13 +84,7 @@ public class Run {
 
         Map<String, Object> map = Interpreter.parseJson(s);
 
-        // check for typing errors
-        try {
-            System.out.println(TypeChecker.typeOf(map));
-        } catch (Exception e) {
-            System.out.println("Type Check Error -> " + e.getMessage());
-            System.exit(1);
-        }
+      
         
         try {
             interpOut(map);

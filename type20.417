@@ -1,0 +1,5 @@
+{
+    def x Lint = mul(5,y);
+    def y L= 5;
+    x
+}
