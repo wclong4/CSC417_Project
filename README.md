@@ -1,4 +1,4 @@
-This project uses Java and Jackson to build a simple interpreter, with JUnit used to test it. Jackson is in jars in the `lib/` directory, so Maven is no longer required.  This change was made because Maven was really slow to build :<
+This project uses Java and Jackson to build a simple interpreter, with JUnit used to test it. Jackson is in jars in the `lib/` directory, so Maven is no longer required.  This change was made because Maven was really slow to build.
 
 ## Build
 The build script makes the parser, puts the parse file
